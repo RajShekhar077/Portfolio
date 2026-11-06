@@ -58,10 +58,13 @@
   const navLinks = $$('.nav-links a[href^="#"]');
   const spy = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) navLinks.forEach(a => a.classList.toggle('active', a.hash === '#' + e.target.id));
+      if (e.isIntersecting) {
+        const id = e.target.id === 'coding' ? 'leetcode' : e.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.hash === '#' + id));
+      }
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
-  ['home', 'about', 'skills', 'projects', 'coding', 'contact'].forEach(id => {
+  ['home', 'about', 'skills', 'projects', 'leetcode', 'coding', 'contact'].forEach(id => {
     const el = d.getElementById(id);
     if (el) spy.observe(el);
   });
@@ -86,7 +89,7 @@
   }
 
   /* scroll reveal with small stagger between siblings */
-  const revealEls = $$('.section h2, .intro, .about-content > *, .skill-list .row, .project, .link-rows a, .stat, .contact > *');
+  const revealEls = $$('.section h2, .intro, .about-content > *, .skill-list .row, .project, .lc-card, .link-rows a, .stat, .contact > *');
   const revealer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
@@ -115,7 +118,10 @@
       })(start);
     });
   }, { threshold: 0.6 });
-  $$('[data-count]').forEach(el => counter.observe(el));
+  $$('[data-count]').forEach(el => {
+    if (!reduce) el.textContent = '0' + (el.dataset.suffix || '');
+    counter.observe(el);
+  });
 
   /* cursor glow + card spotlight (mouse devices only) */
   if (finePointer && !reduce) {
@@ -124,7 +130,7 @@
       glow.style.opacity = 1;
       glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
     }, { passive: true });
-    $$('.project, .link-rows a').forEach(card => {
+    $$('.project, .lc-card, .link-rows a').forEach(card => {
       card.addEventListener('pointermove', e => {
         const r = card.getBoundingClientRect();
         card.style.setProperty('--mx', e.clientX - r.left + 'px');
